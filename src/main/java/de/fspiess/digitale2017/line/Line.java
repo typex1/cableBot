@@ -1,11 +1,11 @@
-package de.fspiess.digitale2017.move;
+package de.fspiess.digitale2017.line;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
 //define this as an entity class:
 @Entity
-public class Move {
+public class Line {
 	
 	@Id
 	private String id;
@@ -17,10 +17,10 @@ public class Move {
 	private int z2;
 	private int servo;
 	
-	public Move() {
+	public Line() {
 	}
 	
-	public Move(String id, int x1, int y1, int z1, int x2, int y2, int z2, int servo) {
+	public Line(String id, int x1, int y1, int z1, int x2, int y2, int z2, int servo) {
 		super();
 		this.id = id;
 		this.x1 = x1;

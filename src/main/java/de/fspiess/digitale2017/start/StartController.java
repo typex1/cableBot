@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import de.fspiess.digitale2017.move.Move;
-import de.fspiess.digitale2017.move.MoveService;
 import de.fspiess.digitale2017.CableBotApp;
+import de.fspiess.digitale2017.line.Line;
+import de.fspiess.digitale2017.line.LineService;
 
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.GpioUtil;
@@ -17,9 +17,9 @@ import com.pi4j.wiringpi.GpioUtil;
 public class StartController {
 
 	@Autowired
-	private MoveService moveService;
-	private List<Move> moveList;
-	private Move move;
+	private LineService lineService;
+	private List<Line> lineList;
+	private Line line;
 	
     private static final int SERVOUP =      11;
     private static final int SERVODOWN=     5;
@@ -93,14 +93,14 @@ public class StartController {
       }
 	
 	@RequestMapping("/start")
-	public String startMovement() throws InterruptedException{
-		moveList = moveService.getAllMoves();
-		for (int i = 0; i < moveList.size(); i++) {
-			//System.out.println(moveList.get(i));
-			move = moveList.get(i);
-			//System.out.println(move.getId());
-			System.out.printf("line: %s %d %d %d %d %d %d %d\n", move.getId(), move.getX1(), move.getY1(), move.getZ1(), 
-																			move.getX2(), move.getY2(), move.getZ2(), move.getServo());
+	public String startLinement() throws InterruptedException{
+		lineList = lineService.getAllLines();
+		for (int i = 0; i < lineList.size(); i++) {
+			//System.out.println(lineList.get(i));
+			line = lineList.get(i);
+			//System.out.println(line.getId());
+			System.out.printf("line: %s %d %d %d %d %d %d %d\n", line.getId(), line.getX1(), line.getY1(), line.getZ1(), 
+																			line.getX2(), line.getY2(), line.getZ2(), line.getServo());
 		}
 		if (CableBotApp.isRaspberryPi()){
 			System.out.println("Raspberry");
@@ -121,6 +121,6 @@ public class StartController {
 		}else{
 			System.out.println("Is not Raspberry");
 		}
-		return "number of lines: "+String.valueOf(moveList.size());
+		return "number of lines: "+String.valueOf(lineList.size());
 	}
 }
