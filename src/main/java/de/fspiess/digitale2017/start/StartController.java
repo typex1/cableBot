@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import de.fspiess.digitale2017.CableBotApp;
 import de.fspiess.digitale2017.line.Line;
+import de.fspiess.digitale2017.line.LineController;
 import de.fspiess.digitale2017.line.LineService;
+import de.fspiess.digitale2017.utils.RaspiUtils;
 
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.GpioUtil;
@@ -32,19 +34,7 @@ public class StartController {
     private static final int RIGHT_STEPPER03=12;
     private static final int RIGHT_STEPPER04=13;
     private static int StepX = 0;
-    private static final int STEP_PAUSE = 1;
-    
-    private void motorsOff(){
-        Gpio.digitalWrite(RIGHT_STEPPER01, 0);
-        Gpio.digitalWrite(RIGHT_STEPPER02, 0);
-        Gpio.digitalWrite(RIGHT_STEPPER03, 0);
-        Gpio.digitalWrite(RIGHT_STEPPER04, 0);
-
-        Gpio.digitalWrite(LEFT_STEPPER03, 0);
-        Gpio.digitalWrite(LEFT_STEPPER01, 0);
-        Gpio.digitalWrite(LEFT_STEPPER02, 0);
-        Gpio.digitalWrite(LEFT_STEPPER04, 0);
-      }
+    private static final int STEP_PAUSE = 2;
     
     private void makeStepRight(int direction) throws InterruptedException {
         StepX += direction;
@@ -102,7 +92,7 @@ public class StartController {
 			System.out.printf("line: %s %d %d %d %d %d %d %d\n", line.getId(), line.getX1(), line.getY1(), line.getZ1(), 
 																			line.getX2(), line.getY2(), line.getZ2(), line.getServo());
 		}
-		if (CableBotApp.isRaspberryPi()){
+		if (RaspiUtils.isRaspberryPi()){
 			System.out.println("Raspberry");
 	        int width = 1000;
 
@@ -119,7 +109,7 @@ public class StartController {
 	            makeStepRight(-1);
 	        }
 		}else{
-			System.out.println("Is not Raspberry");
+			System.out.println("System is not Raspberry");
 		}
 		return "number of lines: "+String.valueOf(lineList.size());
 	}
