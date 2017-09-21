@@ -84,27 +84,14 @@ public class Motor {
 		}
 	}
 	
-	//to be removed:
-	private void init(){
-		if (RaspiUtils.isRaspberryPi()){
-			System.out.println("Raspberry");
-
-	        // set relevant GPIO as outputs:
-	        GpioUtil.export(RIGHT_STEPPER01, GpioUtil.DIRECTION_OUT);
-	        Gpio.pinMode(RIGHT_STEPPER01, Gpio.OUTPUT);
-	        GpioUtil.export(RIGHT_STEPPER02, GpioUtil.DIRECTION_OUT);
-	        Gpio.pinMode(RIGHT_STEPPER02, Gpio.OUTPUT);
-	        GpioUtil.export(RIGHT_STEPPER03, GpioUtil.DIRECTION_OUT);
-	        Gpio.pinMode(RIGHT_STEPPER03, Gpio.OUTPUT);
-	        GpioUtil.export(RIGHT_STEPPER04, GpioUtil.DIRECTION_OUT);
-	        Gpio.pinMode(RIGHT_STEPPER04, Gpio.OUTPUT);
-		}else{
-			System.out.println("Motor.initMotor(): System is not Raspberry");
-		}
+	public void dumpConfig (){
+		System.out.printf("Motor config: %s, %d %d %d %d\n", this.name, this.stepper1, this.stepper2, this.stepper3, this.stepper4);
 	}
+
 	
     public void makeStep(int direction) throws InterruptedException {
         stepX += direction;
+        //System.out.printf("Motor.makestep() - stepX = %d", stepX);
 
         if(stepX > 3){
           stepX = 0;
@@ -113,7 +100,7 @@ public class Motor {
           stepX = 3;
         }
 
-        if(stepX == 0){
+        if(stepX == 0 && RaspiUtils.isRaspberryPi()){
           //System.out.println("step 0");
           Gpio.digitalWrite(this.stepper1, 1);
           Thread.sleep(STEP_PAUSE);
@@ -121,7 +108,7 @@ public class Motor {
           Gpio.digitalWrite(this.stepper3, 0);
           Gpio.digitalWrite(this.stepper4, 0);
         }
-        if(stepX == 1){
+        if(stepX == 1 && RaspiUtils.isRaspberryPi()){
           //System.out.println("step 1");
           Gpio.digitalWrite(this.stepper3, 1);
           Thread.sleep(STEP_PAUSE);
@@ -129,7 +116,7 @@ public class Motor {
           Gpio.digitalWrite(this.stepper2, 0);
           Gpio.digitalWrite(this.stepper4, 0);
         }
-        if(stepX == 2){
+        if(stepX == 2 && RaspiUtils.isRaspberryPi()){
           //System.out.println("step 2");
           Gpio.digitalWrite(this.stepper2, 1);
           Thread.sleep(STEP_PAUSE);
@@ -137,7 +124,7 @@ public class Motor {
           Gpio.digitalWrite(this.stepper3, 0);
           Gpio.digitalWrite(this.stepper4, 0);
         }
-        if(stepX == 3){
+        if(stepX == 3 && RaspiUtils.isRaspberryPi()){
           //System.out.println("step 3");
           Gpio.digitalWrite(this.stepper4, 1);
           Thread.sleep(STEP_PAUSE);

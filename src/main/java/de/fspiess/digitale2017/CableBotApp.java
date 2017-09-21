@@ -43,10 +43,10 @@ public class CableBotApp extends SpringBootServletInitializer implements Servlet
     // this is even called if the tomcat server is killed with "kill <PID>" !
     // motivation: switch off current from all motor coils, otherwise motor keeps being under current!
   	@Override
-      public void contextDestroyed(final ServletContextEvent arg0) {
-          System.out.println("Servlet Context destroyed");
-          //put motor stop function here!
-          Motor.motorsOff();
+	public void contextDestroyed(final ServletContextEvent arg0) {
+	      System.out.println("Servlet Context destroyed");
+	      //put motor stop function here!
+	      Motor.motorsOff();
     }
 	
 }

@@ -60,9 +60,13 @@ public class MotorController{
 																			line.getX2(), line.getY2(), line.getZ2(), line.getServo());
 		}
 		
-		Motor rightStepper=motorService.getMotor("left");
-		for (int i=0; i< 100; i++){
+		Motor rightStepper=motorService.getMotor("right");
+		rightStepper.dumpConfig();
+		for (int i=0; i< 1000; i++){
 			rightStepper.makeStep(1);
+		}
+		for (int i=0; i< 1000; i++){
+			rightStepper.makeStep(-1);
 		}
 		return "number of lines: "+String.valueOf(lineList.size());
 	}
