@@ -18,7 +18,7 @@ import de.fspiess.digitale2017.motor.Motor;
 import de.fspiess.digitale2017.utils.RaspiUtils;
 
 @RestController
-public class LineController implements ServletContextListener{
+public class LineController{ // implements ServletContextListener{
 	
 	//make automatically generated LineService instance available to LineController:
 	@Autowired
@@ -55,37 +55,5 @@ public class LineController implements ServletContextListener{
 	public LineService getLineService(){
 		return lineService;
 	}
-	
-	//this is even called if the tomcat server is killed with "kill <PID>" !
-	@Override
-    public void contextDestroyed(final ServletContextEvent arg0) {
-        System.out.println("Servlet Context destroyed");
-        //put motor stop function here!
-        Motor.motorsOff();
-    }
-
-	
-    @Override
-    public void contextInitialized(final ServletContextEvent arg0) {
-        try {
-            System.out.println("Creating Servlet Context");
-            
-            //this is definetely invoked at servlet startup, in contrast to the above main() method!
-            if (RaspiUtils.isRaspberryPi()){
-    			System.out.println("This is a Raspberry!");
-
-    	        // setup wiringPi
-    	        if (Gpio.wiringPiSetup() == -1) {
-    	            System.out.println(" ==>> GPIO SETUP FAILED");
-    	        }else{
-    	        	System.out.println(" ==>> GPID Setup SUCCESSFUL");
-    	        }
-    		}else{
-    			System.out.println("Platform is not Raspberry (arm), GPIO functions will not be called.");
-    		}
-        } finally {
-            System.out.println("Servlet Context created");
-        }
-    }
 
 }

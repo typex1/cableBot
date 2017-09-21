@@ -6,6 +6,8 @@ public class RaspiUtils {
 	
     public static boolean isRaspberryPi() {
         return (OS.indexOf("arm") >= 0);
+    	//mock: avoid arm detection:
+    	//return (OS.indexOf("XY") >= 0);
     }
 
 }
