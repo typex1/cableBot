@@ -1,6 +1,7 @@
 package de.fspiess.digitale2017.motor;
 
 import java.util.List;
+import java.util.Queue;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -13,7 +14,9 @@ import de.fspiess.digitale2017.CableBotApp;
 import de.fspiess.digitale2017.line.Line;
 import de.fspiess.digitale2017.line.LineController;
 import de.fspiess.digitale2017.line.LineService;
+import de.fspiess.digitale2017.utils.Point;
 import de.fspiess.digitale2017.utils.RaspiUtils;
+import de.fspiess.digitale2017.utils.MotorStep;
 
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.GpioUtil;
@@ -58,17 +61,27 @@ public class MotorController{
 			//System.out.println(line.getId());
 			System.out.printf("line: %s %d %d %d %d %d %d %d\n", line.getId(), line.getX1(), line.getY1(), line.getZ1(), 
 																			line.getX2(), line.getY2(), line.getZ2(), line.getServo());
+		
+			Queue<Point> stepQueue = de.fspiess.digitale2017.utils.MotorStep.motorSteps(line.getX1(), line.getY1(), line.getZ1(), line.getX2(), line.getY2(), line.getZ2());
+			Motor rightStepper=motorService.getMotor("right");
+			rightStepper.dumpConfig();
+			Motor leftStepper=motorService.getMotor("left");
+			leftStepper.dumpConfig();
+			
+			for(Object item:stepQueue){
+				rightStepper.makeStep(((Point) item).getX());
+				leftStepper.makeStep(((Point) item).getY());
+			}
 		}
 		
-		Motor rightStepper=motorService.getMotor("right");
-		rightStepper.dumpConfig();
-		for (int i=0; i< 1000; i++){
-			rightStepper.makeStep(1);
-		}
-		for (int i=0; i< 1000; i++){
-			rightStepper.makeStep(-1);
-		}
+		
+		
 		return "number of lines: "+String.valueOf(lineList.size());
+	}
+	
+	@RequestMapping("/end")
+	public void turnOffGpioPins() throws InterruptedException{
+		Motor.motorsOff();
 	}
     
 }
