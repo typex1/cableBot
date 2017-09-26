@@ -18,7 +18,9 @@ public class MotorStep {
         int z2 = -1;
         
         //at first, calculate queue of Bresenham points:
-        Queue<Point> line = de.fspiess.digitale2017.utils.Bresenham.line3D(xStart, yStart, zStart, xEnd, yEnd, zEnd);
+        System.out.println("Start Bresenham queue build...");
+        Queue<Point> line = Bresenham.line3D(xStart, yStart, zStart, xEnd, yEnd, zEnd);
+        System.out.println("end Bresenham build.");
         
         Queue<Point> result = new LinkedList<Point>();
         Point point = new Point();
@@ -28,7 +30,7 @@ public class MotorStep {
         	x1 = ((Point) item).getX();
         	y1 = ((Point) item).getY();
         	z1 = ((Point) item).getZ();
-        	System.out.printf("Point %d %d %d - ", ((Point) item).getX(), ((Point) item).getY(), ((Point) item).getZ());
+        	//System.out.printf("Point %d %d %d - ", ((Point) item).getX(), ((Point) item).getY(), ((Point) item).getZ());
         	if (x2 > -1){
         		point.setX(x1-x2);
         	}
@@ -39,7 +41,7 @@ public class MotorStep {
         		point.setZ(z1-z2);
         		result.offer(point);
         	}
-        	System.out.printf("Step: %d %d %d\n", point.getX(), point.getY(), point.getZ());
+        	//System.out.printf("Step: %d %d %d\n", point.getX(), point.getY(), point.getZ());
         	
         	if (Math.abs(point.getX()) >1 || Math.abs(point.getY()) > 1 || Math.abs(point.getZ()) > 1){
         		System.out.println("ERROR in Bresenham algorithm - must not compute steps > 1 !!");

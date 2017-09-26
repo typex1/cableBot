@@ -62,11 +62,13 @@ public class MotorController{
 			System.out.printf("line: %s %d %d %d %d %d %d %d\n", line.getId(), line.getX1(), line.getY1(), line.getZ1(), 
 																			line.getX2(), line.getY2(), line.getZ2(), line.getServo());
 		
-			Queue<Point> stepQueue = de.fspiess.digitale2017.utils.MotorStep.motorSteps(line.getX1(), line.getY1(), line.getZ1(), line.getX2(), line.getY2(), line.getZ2());
+			System.out.println("Start stepQueue build...");
+			Queue<Point> stepQueue = MotorStep.motorSteps(line.getX1(), line.getY1(), line.getZ1(), line.getX2(), line.getY2(), line.getZ2());
+			System.out.println("end stepQueue build.");
 			Motor rightStepper=motorService.getMotor("right");
-			rightStepper.dumpConfig();
+			//rightStepper.dumpConfig();
 			Motor leftStepper=motorService.getMotor("left");
-			leftStepper.dumpConfig();
+			//leftStepper.dumpConfig();
 			
 			for(Object item:stepQueue){
 				rightStepper.makeStep(((Point) item).getX());
