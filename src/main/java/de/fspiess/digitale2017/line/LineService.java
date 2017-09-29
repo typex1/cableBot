@@ -57,8 +57,27 @@ public class LineService {
 	}
 
 	public void deleteLine(String id) {
+		if (id == "all"){
+			List<Line> lines = new ArrayList<>();
+			lineRepository.findAll().forEach(lines::add);
+			for (int i=0; i<lines.size(); i++){
+				Line t = lines.get(i);
+				lineRepository.delete(t.getId());
+			}
+		}else{
+			lineRepository.delete(id);
+		}
+	}
+	
+	public void deleteAllLines() {
 		//lines.relineIf(t -> t.getId().equals(id));
-		lineRepository.delete(id);
+		List<Line> lines = new ArrayList<>();
+		lineRepository.findAll() //this returns an iterable
+		.forEach(lines::add);
+		for (int i=0; i<lines.size(); i++){
+			Line t = lines.get(i);
+			lineRepository.delete(t.getId());
+		}
 	}
 
 }

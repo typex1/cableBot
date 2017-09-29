@@ -1,14 +1,6 @@
 package de.fspiess.digitale2017.motor;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.pi4j.wiringpi.Gpio;
-
-import de.fspiess.digitale2017.utils.RaspiUtils;
 
 @Service
 public class MotorService{
@@ -17,6 +9,7 @@ public class MotorService{
 	Motor rightStepper = new Motor("right");
 	//@Autowired
 	Motor leftStepper = new Motor("left");
+	Motor servo = new Motor("servo");
 	
 	public MotorService() {	
 		System.out.println("MotorService constructor!");
@@ -28,6 +21,9 @@ public class MotorService{
 		}
 		if (name == "left"){
 			return leftStepper;
+		}
+		if (name == "servo"){
+			return servo;
 		}
 		return rightStepper;
 	}

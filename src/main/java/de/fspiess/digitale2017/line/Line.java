@@ -3,9 +3,16 @@ package de.fspiess.digitale2017.line;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.fspiess.digitale2017.motor.MotorController;
+
 //define this as an entity class:
 @Entity
 public class Line {
+	
+	final static Logger logger = LoggerFactory.getLogger(MotorController.class);
 	
 	@Id
 	private String id;
@@ -26,10 +33,20 @@ public class Line {
 		this.x1 = x1;
 		this.y1 = y1;
 		this.z1 = z1;
-		this.x1 = x2;
-		this.y1 = y2;
-		this.z1 = z2;
+		this.x2 = x2;
+		this.y2 = y2;
+		this.z2 = z2;
 		this.servo = servo;
+	}
+	
+	//check if end of lastLine is same as beginning of next line
+	public boolean isSeparate(Line otherLine){
+		logger.info("to compare: otherLine.getX2()={} != this.x1={} || otherLine.getY2()={} != this.y1={} || otherLine.getZ2()={} != this.z1={}", 
+				otherLine.getX2(), this.x1, otherLine.getY2(), this.y1, otherLine.getZ2(), this.z1);
+		if (otherLine.getX2() != this.x1 || otherLine.getY2() != this.y1 || otherLine.getZ2() != this.z1){
+			return true;
+		}
+		return false;
 	}
 	
 	public String getId() {
