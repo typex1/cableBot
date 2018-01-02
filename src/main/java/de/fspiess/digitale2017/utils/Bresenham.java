@@ -1,8 +1,6 @@
 package de.fspiess.digitale2017.utils;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
 
 import de.fspiess.digitale2017.utils.Point;

@@ -22,12 +22,12 @@ public class Line {
 	private int x2;
 	private int y2;
 	private int z2;
-	private int servo;
+	private int servoPosition;
 	
 	public Line() {
 	}
 	
-	public Line(String id, int x1, int y1, int z1, int x2, int y2, int z2, int servo) {
+	public Line(String id, int x1, int y1, int z1, int x2, int y2, int z2, int servoPosition) {
 		super();
 		this.id = id;
 		this.x1 = x1;
@@ -36,7 +36,7 @@ public class Line {
 		this.x2 = x2;
 		this.y2 = y2;
 		this.z2 = z2;
-		this.servo = servo;
+		this.servoPosition = servoPosition;
 	}
 	
 	//check if end of lastLine is same as beginning of next line
@@ -97,10 +97,10 @@ public class Line {
 		this.z2 = z2;
 	}
 	
-	public int getServo() {
-		return servo;
+	public int getServoPosition() {
+		return servoPosition;
 	}
-	public void setServo(int servo) {
-		this.servo = servo;
+	public void setServoPosition(int servo) {
+		this.servoPosition = servoPosition;
 	}
 }

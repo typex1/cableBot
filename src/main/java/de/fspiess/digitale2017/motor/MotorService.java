@@ -9,6 +9,7 @@ public class MotorService{
 	Motor rightStepper = new Motor("right");
 	//@Autowired
 	Motor leftStepper = new Motor("left");
+	Motor zStepper = new Motor("z");
 	Motor servo = new Motor("servo");
 	
 	public MotorService() {	
@@ -21,6 +22,9 @@ public class MotorService{
 		}
 		if (name == "left"){
 			return leftStepper;
+		}
+		if (name == "z"){
+			return zStepper;
 		}
 		if (name == "servo"){
 			return servo;

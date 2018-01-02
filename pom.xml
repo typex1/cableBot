@@ -57,7 +57,9 @@
 		<dependency>
     		<groupId>com.pi4j</groupId>
     		<artifactId>pi4j-core</artifactId>
-   			<version>1.1</version>
+   			<!-- <version>1.1</version> -->
+   			<!--  check here for newest version: http://pi4j.com/download.html -->
+   			<version>1.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -90,7 +92,8 @@
 			<artifactId>tomcat7-maven-plugin</artifactId>
 			<version>2.2</version>
 			<configuration>
-				<url>http://192.168.1.104:8080/manager/text</url>
+				<!-- <url>http://192.168.1.104:8080/manager/text</url> -->
+				<url>http://192.168.1.114:8080/manager/text</url>
 				<server>TomcatServer</server>
 				<!--<path>/moves</path>-->
 				<username>system</username>
@@ -99,6 +102,15 @@
 		</plugin>
 		</plugins>
 	</build>
-
-
+<repositories>
+	<repository>
+		<id>oss-snapshots-repo</id>
+		<name>Sonatype OSS Maven Repository</name>
+		<url>https://oss.sonatype.org/content/groups/public</url>
+		<snapshots>
+			<enabled>true</enabled>
+			<updatePolicy>always</updatePolicy>
+		</snapshots>
+	</repository>
+</repositories>
 </project>

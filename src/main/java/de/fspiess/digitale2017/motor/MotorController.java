@@ -16,7 +16,9 @@ import de.fspiess.digitale2017.line.Line;
 import de.fspiess.digitale2017.line.LineService;
 import de.fspiess.digitale2017.utils.Point;
 import de.fspiess.digitale2017.utils.RaspiUtils;
+import de.fspiess.digitale2017.utils.Bresenham;
 import de.fspiess.digitale2017.utils.Calibration;
+import de.fspiess.digitale2017.utils.CoordTrafo;
 import de.fspiess.digitale2017.utils.MotorStep;
 
 import com.pi4j.wiringpi.Gpio;
@@ -54,7 +56,7 @@ public class MotorController{
 		}
 	}
 	
-	
+	// actual drawing section - move pen along the lines and between the lines, pen can be up or down
 	@RequestMapping("/start")
 	public String startMovement() throws InterruptedException{
 		lineList = lineService.getAllLines();
@@ -63,7 +65,7 @@ public class MotorController{
 			line = lineList.get(i);
 			//logger.info(line.getId());
 			logger.info("line: {} {} {} {} {} {} {} {}", line.getId(), line.getX1(), line.getY1(), line.getZ1(), 
-																			line.getX2(), line.getY2(), line.getZ2(), line.getServo());
+																			line.getX2(), line.getY2(), line.getZ2(), line.getServoPosition());
 			Motor rightStepper=motorService.getMotor("right");
 			//rightStepper.dumpConfig();
 			Motor leftStepper=motorService.getMotor("left");
@@ -74,12 +76,15 @@ public class MotorController{
 			
 			// if there was already a line before, set pen up and move from end of last line to beginning of next line,
 			// i.e. allow for drawing lines which are not connected to each other
+			
+			/* commented out to test only the coord-trafo part!
 			if (lastLine != null && line.isSeparate(lastLine)){
 				logger.info("line is NOT linked to last line, so lift pen and move to next line start!");
 				servo.servoUp();
 				Queue<Point> interimStepQueue = MotorStep.motorSteps(	lastLine.getX2(), lastLine.getY2(), line.getZ2(), 
 																		line.getX1(), line.getY1(), line.getZ1());
 				for(Object item:interimStepQueue){
+					// todo: insert sth like moveXYZ(.getX(), .getY(), .getZ())
 					rightStepper.makeStep(((Point) item).getX());
 					leftStepper.makeStep(((Point) item).getY());
 					zStepper.makeStep(((Point) item).getZ());
@@ -98,38 +103,71 @@ public class MotorController{
 					zStepper.makeStep(((Point) item).getZ());
 				}
 			}
+			
 			lastLine = line;
 			
+			//log some lines to see how long the queue build takes:
 			logger.info("Start stepQueue build...");
 			//calculate Bresenham points of current line:
 			Queue<Point> stepQueue = MotorStep.motorSteps(line.getX1(), line.getY1(), line.getZ1(), line.getX2(), line.getY2(), line.getZ2());
 			logger.info("end stepQueue build.");
 
+			//if servoPosition is other than 0, put pen "Down", i.e. on paper!
+			if (line.getServoPosition() > 0){
+				servo.servoDown();
+			}else{
+				servo.servoUp();
+			}
 			
 			for(Object item:stepQueue){
 				rightStepper.makeStep(((Point) item).getX());
 				leftStepper.makeStep(((Point) item).getY());
 				zStepper.makeStep(((Point) item).getZ());
+			}*/
+			// added coord-trafo:
+			long[] cordLength = new long[3];
+			cordLength[0] = Calibration.CORDLENGTH_RIGHT * (long)Calibration.stepsPerMM;
+			cordLength[1] = Calibration.CORDLENGTH_LEFT * (long)Calibration.stepsPerMM;
+			cordLength[2] = 0L;
+			long x0 = (cordLength[1] * cordLength[1] - cordLength[0] * cordLength[0] + Calibration.baseLength * Calibration.baseLength)
+					/ (2L * Calibration.baseLength);
+			long y0 = (long)Math.sqrt(cordLength[0] * cordLength[0] - (Calibration.baseLength - x0) * (Calibration.baseLength - x0));
+			
+			Queue<Point> bresenhamPoints = Bresenham.line3D(line.getX1(), line.getY1(), line.getZ1(), line.getX2(), line.getY2(), line.getZ2());
+			logger.info("COORD-TRAFO: now beginning to calculate thread lengths and move steppers:");
+			for(Object item:bresenhamPoints){
+				CoordTrafo.moveXYZ(	((Point) item).getX(),
+									((Point) item).getY(),
+									((Point) item).getZ(), x0, y0, cordLength, rightStepper, leftStepper);
+				logger.info("draw loop: X={}, X={}, new lengthR={}, newLengthL={}", ((Point) item).getX(), ((Point) item).getY(), cordLength[0], cordLength[1]);
 			}
+			logger.info("COORD-TRAFO: done.");
+			// end added coord-trafo.
 		}
 		
+		// remember: as this class is annotated with "@RequestMapping", the returned String is directly shown in the browser/Postman window!
 		return "number of lines: "+String.valueOf(lineList.size());
 	}
 	
 	@RequestMapping(method=RequestMethod.POST, value = "/moveMM/{x}/{y}/{z}")
-	public void moveOrigin(@PathVariable int x, @PathVariable int y, @PathVariable int z) throws InterruptedException{
+	public String moveOrigin(@PathVariable int x, @PathVariable int y, @PathVariable int z) throws InterruptedException{
 		
 		Motor rightStepper=motorService.getMotor("right");
 		Motor leftStepper=motorService.getMotor("left");
 		Motor zStepper=motorService.getMotor("z");
 		Motor servo=motorService.getMotor("servo");
+		int maxLength = 1000; // max. motion distance in mm
+		
+		if (x > maxLength || y > maxLength || z > maxLength){
+			return "motion length is too large, maybe an error?";
+		}
 		
 		//when calibrating the origin, make sure that pen is up
 		servo.servoUp();
 		
-		int moveX = x*(int)Calibration.stepsPerMM;
-		int moveY = y*(int)Calibration.stepsPerMM;
-		int moveZ = z*(int)Calibration.stepsPerMM;
+		int stepsX = x*(int)Calibration.stepsPerMM;
+		int stepsY = y*(int)Calibration.stepsPerMM;
+		int stepsZ = z*(int)Calibration.stepsPerMM;
 		
 		
 		
@@ -137,15 +175,16 @@ public class MotorController{
 		if(logger.isDebugEnabled()){
 			logger.debug("moving coordinates in millimeters: {}, {}, {}", x, y, z);
 		}
-		logger.info("info: moving coordinates in millimeters: {}, {}, {}", moveX, moveY, moveZ);
+		logger.info("info: moving coordinates in millimeters: {}, {}, {}", stepsX, stepsY, stepsZ);
 		
-		Queue<Point> stepQueue = MotorStep.motorSteps(0, 0, 0, moveX, moveY, moveZ);
+		Queue<Point> stepQueue = MotorStep.motorSteps(0, 0, 0, stepsX, stepsY, stepsZ);
 		
 		for(Object item:stepQueue){
 			rightStepper.makeStep(((Point) item).getX());
 			leftStepper.makeStep(((Point) item).getY());
 			zStepper.makeStep(((Point) item).getZ());
 		}
+		return "/moveMM done.";
 	}
 	
 	@RequestMapping("/end")
