@@ -12,20 +12,33 @@ import de.fspiess.digitale2017.utils.RaspiUtils;
 public class Motor {
 	
 	//overall wiringPi GPIO pin numbers:
+	/* correct:
     private static final int LEFT_STEPPER01=11;
     private static final int LEFT_STEPPER02=10;
     private static final int LEFT_STEPPER03= 6;
     private static final int LEFT_STEPPER04=14;
+    */
+    private static final int LEFT_STEPPER01=26;
+    private static final int LEFT_STEPPER02=27;
+    private static final int LEFT_STEPPER03=28;
+    private static final int LEFT_STEPPER04=29;
+    
     private static final int RIGHT_STEPPER01= 2;
     private static final int RIGHT_STEPPER02= 3;
     private static final int RIGHT_STEPPER03=12;
     private static final int RIGHT_STEPPER04=13;
+    /* correct:
     private static final int Z_STEPPER01=26;
     private static final int Z_STEPPER02=27;
     private static final int Z_STEPPER03=28;
     private static final int Z_STEPPER04=29;
-    private static final int SERVO_PIN=0;
+    */
+    private static final int Z_STEPPER01=11;
+    private static final int Z_STEPPER02=10;
+    private static final int Z_STEPPER03=6;
+    private static final int Z_STEPPER04=14;
     
+    private static final int SERVO_PIN=0;
     private static final int SERVO_INIT=11;
     private static final int SERVO_RANGE=200;
     private static final int SERVO_UP=11;
@@ -36,7 +49,7 @@ public class Motor {
     
     // Iterates between 0,1,2,3 and 0 again. For switching through the different motor coils.
     private int stepX = 0;
-    private int STEP_PAUSE = 1;
+    private int STEP_PAUSE = 4;// 2 is best value for a smooth, fast move.
     
     //motor instance wiringPi GPIO pin numbers:
     private int stepper1 = -1;
@@ -140,7 +153,8 @@ public class Motor {
 	      Gpio.digitalWrite(this.stepper2, 0);
 	      Gpio.digitalWrite(this.stepper3, 0);
 	      Gpio.digitalWrite(this.stepper4, 0);
-	      sleepMillis(STEP_PAUSE);
+	      //sleepMillis(STEP_PAUSE);
+	      Thread.sleep(STEP_PAUSE);
 	    }
 	    if(stepX == 1 && RaspiUtils.isRaspberryPi()){
 	      //System.out.println("step 1");
@@ -148,7 +162,8 @@ public class Motor {
 	      Gpio.digitalWrite(this.stepper1, 0);
 	      Gpio.digitalWrite(this.stepper2, 0);
 	      Gpio.digitalWrite(this.stepper4, 0);
-	      sleepMillis(STEP_PAUSE);
+	      //sleepMillis(STEP_PAUSE);
+	      Thread.sleep(STEP_PAUSE);
 	    }
 	    if(stepX == 2 && RaspiUtils.isRaspberryPi()){
 	      //System.out.println("step 2");
@@ -156,7 +171,8 @@ public class Motor {
 	      Gpio.digitalWrite(this.stepper1, 0);
 	      Gpio.digitalWrite(this.stepper3, 0);
 	      Gpio.digitalWrite(this.stepper4, 0);
-	      sleepMillis(STEP_PAUSE);
+	      //sleepMillis(STEP_PAUSE);
+	      Thread.sleep(STEP_PAUSE);
 	    }
 	    if(stepX == 3 && RaspiUtils.isRaspberryPi()){
 	      //System.out.println("step 3");
@@ -164,10 +180,11 @@ public class Motor {
 	      Gpio.digitalWrite(this.stepper1, 0);
 	      Gpio.digitalWrite(this.stepper2, 0);
 	      Gpio.digitalWrite(this.stepper3, 0);
-	      sleepMillis(STEP_PAUSE);
+	      //sleepMillis(STEP_PAUSE);
+	      Thread.sleep(STEP_PAUSE);
 	    }
 	
-	    Thread.sleep(STEP_PAUSE);
+	    //Thread.sleep(STEP_PAUSE);
 	}
     
 

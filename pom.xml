@@ -81,6 +81,51 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<!-- INT Testing hints taken from https://www.petrikainulainen.net/programming/maven/integration-testing-with-maven/ -->
+			    <groupId>org.codehaus.mojo</groupId>
+			    <artifactId>build-helper-maven-plugin</artifactId>
+			    <version>1.9.1</version>
+			    <executions>
+			        <!-- Add executions here -->
+			        <!-- Add a new source directory to our build -->
+					<execution>
+					    <id>add-integration-test-sources</id>
+					    <phase>generate-test-sources</phase>
+					    <goals>
+					        <goal>add-test-source</goal>
+					    </goals>
+					    <configuration>
+					        <!-- Configures the source directory of our integration tests -->
+					        <sources>
+					            <source>src/integration-test/java</source>
+					        </sources>
+					    </configuration>
+					</execution>
+					<!-- Add a new resource directory to our build -->
+					<execution>
+					    <id>add-integration-test-resources</id>
+					    <phase>generate-test-resources</phase>
+					    <goals>
+					        <goal>add-test-resource</goal>
+					    </goals>
+					    <configuration>
+					        <!-- Configures the resource directory of our integration tests -->
+					        <resources>
+					            <!--
+					                Placeholders that are found from the files located in the configured resource
+					                directories are replaced with the property values found from the profile
+					                specific configuration file.
+					            -->
+					            <resource>
+					                <filtering>true</filtering>
+					                <directory>src/integration-test/resources</directory>
+					            </resource>
+					        </resources>
+					    </configuration>
+					</execution>
+			    </executions>
+			</plugin>
+			<plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
             <!-- <configuration>
