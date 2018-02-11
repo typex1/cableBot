@@ -148,9 +148,13 @@ public class MotorController{
 		// remember: as this class is annotated with "@RequestMapping", the returned String is directly shown in the browser/Postman window!
 		return "number of lines: "+String.valueOf(lineList.size());
 	}
-	
-	@RequestMapping(method=RequestMethod.POST, value = "/moveMM/{x}/{y}/{z}")
-	public String moveOrigin(@PathVariable int x, @PathVariable int y, @PathVariable int z) throws InterruptedException{
+
+	/*
+	This moves each motor's thread by x/y/z millimeters
+	 */
+	@RequestMapping(method=RequestMethod.POST, value = "/moveMM/{x}/{y}/{z}/{stepPause}")
+	public String moveOrigin(@PathVariable int x, @PathVariable int y, @PathVariable int z,
+							 @PathVariable int stepPause) throws InterruptedException{
 		
 		Motor rightStepper=motorService.getMotor("right");
 		Motor leftStepper=motorService.getMotor("left");
@@ -169,8 +173,6 @@ public class MotorController{
 		int stepsY = y*(int)Calibration.stepsPerMM;
 		int stepsZ = z*(int)Calibration.stepsPerMM;
 		
-		
-		
 		// "debug" functionality does not work at all:
 		if(logger.isDebugEnabled()){
 			logger.debug("moving coordinates in millimeters: {}, {}, {}", x, y, z);
@@ -179,12 +181,66 @@ public class MotorController{
 		
 		Queue<Point> stepQueue = MotorStep.motorSteps(0, 0, 0, stepsX, stepsY, stepsZ);
 		
-		for(Object item:stepQueue){
+		/*for(Object item:stepQueue){
 			rightStepper.makeStep(((Point) item).getX());
 			leftStepper.makeStep(((Point) item).getY());
 			zStepper.makeStep(((Point) item).getZ());
+		}*/
+
+		/* todo: avoid stepper movement if not needed - because each step consumes stepPause time! */
+		for(Object item:stepQueue){
+			rightStepper.makeStepWithStepPause(((Point) item).getX(), stepPause);
+			leftStepper.makeStepWithStepPause(((Point) item).getY(), stepPause);
+			zStepper.makeStepWithStepPause(((Point) item).getZ(), stepPause);
 		}
 		return "/moveMM done.";
+	}
+
+
+	@RequestMapping(method=RequestMethod.POST, value = "/checkMotorL")
+	public String checkMotorLeft() throws InterruptedException{
+
+		Motor leftStepper=motorService.getMotor("left");
+
+		for(int i=0; i<50; i++){
+			leftStepper.makeStep(1);
+		}
+		for(int i=0; i<50; i++){
+			leftStepper.makeStep(-1);
+		}
+		logger.info("checkMotorLeft() invoked.");
+		return "/checkMotorL done.";
+	}
+
+	@RequestMapping(method=RequestMethod.POST, value = "/checkMotorR")
+	public String checkMotorRight() throws InterruptedException{
+
+		Motor rightStepper=motorService.getMotor("right");
+
+		for(int i=0; i<50; i++){
+			rightStepper.makeStep(1);
+		}
+		for(int i=0; i<50; i++){
+			rightStepper.makeStep(-1);
+		}
+		logger.info("checkMotorRight() invoked.");
+		return "/checkMotorR done.";
+	}
+
+
+	@RequestMapping(method=RequestMethod.POST, value = "/checkMotorZ")
+	public String checkMotorZ() throws InterruptedException{
+
+		Motor zStepper=motorService.getMotor("z");
+
+		for(int i=0; i<50; i++){
+			zStepper.makeStep(1);
+		}
+		for(int i=0; i<50; i++){
+			zStepper.makeStep(-1);
+		}
+		logger.info("checkMotorZ() invoked.");
+		return "/checkMotorZ done.";
 	}
 	
 	@RequestMapping("/end")

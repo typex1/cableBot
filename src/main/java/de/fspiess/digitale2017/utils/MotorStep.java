@@ -20,7 +20,7 @@ public class MotorStep {
         //at first, calculate queue of Bresenham points:
         System.out.println("Start Bresenham queue build...");
         Queue<Point> line = Bresenham.line3D(xStart, yStart, zStart, xEnd, yEnd, zEnd);
-        System.out.println("end Bresenham build.");
+        System.out.println("End Bresenham build.");
         
         Queue<Point> result = new LinkedList<Point>();
         Point point = new Point();

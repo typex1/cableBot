@@ -5,6 +5,8 @@ import com.pi4j.wiringpi.GpioUtil;
 import com.pi4j.wiringpi.SoftPwm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 import java.util.concurrent.locks.LockSupport;
 
 import de.fspiess.digitale2017.utils.RaspiUtils;
@@ -12,31 +14,20 @@ import de.fspiess.digitale2017.utils.RaspiUtils;
 public class Motor {
 	
 	//overall wiringPi GPIO pin numbers:
-	/* correct:
     private static final int LEFT_STEPPER01=11;
     private static final int LEFT_STEPPER02=10;
     private static final int LEFT_STEPPER03= 6;
     private static final int LEFT_STEPPER04=14;
-    */
-    private static final int LEFT_STEPPER01=26;
-    private static final int LEFT_STEPPER02=27;
-    private static final int LEFT_STEPPER03=28;
-    private static final int LEFT_STEPPER04=29;
     
     private static final int RIGHT_STEPPER01= 2;
     private static final int RIGHT_STEPPER02= 3;
     private static final int RIGHT_STEPPER03=12;
     private static final int RIGHT_STEPPER04=13;
-    /* correct:
+
     private static final int Z_STEPPER01=26;
     private static final int Z_STEPPER02=27;
     private static final int Z_STEPPER03=28;
     private static final int Z_STEPPER04=29;
-    */
-    private static final int Z_STEPPER01=11;
-    private static final int Z_STEPPER02=10;
-    private static final int Z_STEPPER03=6;
-    private static final int Z_STEPPER04=14;
     
     private static final int SERVO_PIN=0;
     private static final int SERVO_INIT=11;
@@ -70,25 +61,25 @@ public class Motor {
 	public Motor(String name){
 		super();
 		this.name = name;
-		if (this.name == "left"){
+		if (Objects.equals(this.name, "left")){
 			this.stepper1 = LEFT_STEPPER01;
 			this.stepper2 = LEFT_STEPPER02;
 			this.stepper3 = LEFT_STEPPER03;
 			this.stepper4 = LEFT_STEPPER04;
 		}
-		if (this.name == "right"){
+		if (Objects.equals(this.name, "right")){
 			this.stepper1 = RIGHT_STEPPER01;
 			this.stepper2 = RIGHT_STEPPER02;
 			this.stepper3 = RIGHT_STEPPER03;
 			this.stepper4 = RIGHT_STEPPER04;
 		}
-		if (this.name == "z"){
+		if (this.name.equals("z")){
 			this.stepper1 = Z_STEPPER01;
 			this.stepper2 = Z_STEPPER02;
 			this.stepper3 = Z_STEPPER03;
 			this.stepper4 = Z_STEPPER04;
 		}
-		if (this.name == "servo"){
+		if (this.name.equals("servo")){
 			this.servoPin = SERVO_PIN;
 		    this.servoInit = SERVO_INIT;
 		    this.servoRange = SERVO_RANGE;
@@ -98,6 +89,7 @@ public class Motor {
 		
 		if (RaspiUtils.isRaspberryPi()){
 			System.out.println("Motor() constructor runs on Raspberry");
+			logger.info("via logger.info: Motor() constructor runs on Raspberry");
 
 	        // set relevant GPIO as outputs - only valid for stepper motors, not for servo !
 			if(this.stepper1 != -1 && this.stepper2 != -1 && this.stepper3 != -1 && this.stepper4 != -1){
@@ -186,7 +178,56 @@ public class Motor {
 	
 	    //Thread.sleep(STEP_PAUSE);
 	}
-    
+
+	public void makeStepWithStepPause(int direction, int pause) throws InterruptedException {
+		stepX += direction;
+		//System.out.printf("Motor.makestep() - stepX = %d", stepX);
+
+		if(stepX > 3){
+			stepX = 0;
+		}
+		if(stepX < 0){
+			stepX = 3;
+		}
+
+		if(stepX == 0 && RaspiUtils.isRaspberryPi()){
+			//System.out.println("step 0");
+			Gpio.digitalWrite(this.stepper1, 1);
+			Gpio.digitalWrite(this.stepper2, 0);
+			Gpio.digitalWrite(this.stepper3, 0);
+			Gpio.digitalWrite(this.stepper4, 0);
+			sleepMillis(pause);
+			//Thread.sleep(pause);
+		}
+		if(stepX == 1 && RaspiUtils.isRaspberryPi()){
+			//System.out.println("step 1");
+			Gpio.digitalWrite(this.stepper3, 1);
+			Gpio.digitalWrite(this.stepper1, 0);
+			Gpio.digitalWrite(this.stepper2, 0);
+			Gpio.digitalWrite(this.stepper4, 0);
+			sleepMillis(pause);
+			//Thread.sleep(pause);
+		}
+		if(stepX == 2 && RaspiUtils.isRaspberryPi()){
+			//System.out.println("step 2");
+			Gpio.digitalWrite(this.stepper2, 1);
+			Gpio.digitalWrite(this.stepper1, 0);
+			Gpio.digitalWrite(this.stepper3, 0);
+			Gpio.digitalWrite(this.stepper4, 0);
+			sleepMillis(pause);
+			//Thread.sleep(pause);
+		}
+		if(stepX == 3 && RaspiUtils.isRaspberryPi()){
+			//System.out.println("step 3");
+			Gpio.digitalWrite(this.stepper4, 1);
+			Gpio.digitalWrite(this.stepper1, 0);
+			Gpio.digitalWrite(this.stepper2, 0);
+			Gpio.digitalWrite(this.stepper3, 0);
+			sleepMillis(pause);
+			//Thread.sleep(pause);
+		}
+		logger.info("makeStepWithStepPause() done.");
+	}
 
     
     public void servoUp() throws InterruptedException{

@@ -35,7 +35,7 @@ public class CableBotAppTests {
 		for(int i=0; i<200; i++){
 			makeStep(1);
 		}
-		System.out.println("\n\n *TEST* runMotorSteps done!\n\n");
+		System.out.println("\n\n *TEST* runMotorSteps done!!\n\n");
 	}
 	
     private void makeStep(int direction) throws InterruptedException {
